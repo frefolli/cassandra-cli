@@ -1,5 +1,5 @@
-from lib.regex_utils import identify_next_jinja_reference
-from lib.env import get_from_env
+from cassandra.regex_utils import identify_next_jinja_reference
+from cassandra.env import get_from_env
 
 def closure_for_jinja(text: str, env: dict) -> str:
   next_reference = identify_next_jinja_reference(text)

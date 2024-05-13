@@ -5,14 +5,14 @@ import sys
 import argparse
 import logging
 
-from lib.yaml_utils import read_yaml_file, write_yaml_file
-from lib.properties_utils import write_properties_file
-from lib.bash_utils import read_bash_file, write_bash_file
-from lib.config import preprocess_config
-from lib.env import build_env_for_node
-from lib.dict_clojure import closure_for_skel
-from lib.jinja_clojure import closure_for_jinja
-from lib.ssh import ssh_execute_command, ssh_send_file
+from cassandra.yaml_utils import read_yaml_file, write_yaml_file
+from cassandra.properties_utils import write_properties_file
+from cassandra.bash_utils import read_bash_file, write_bash_file
+from cassandra.config import preprocess_config
+from cassandra.env import build_env_for_node
+from cassandra.dict_clojure import closure_for_skel
+from cassandra.jinja_clojure import closure_for_jinja
+from cassandra.ssh import ssh_execute_command, ssh_send_file
 
 CASSANDRA_HOME="/home/cassandra24/apache-cassandra-5.0-beta1"
 CASSANDRA=f"{CASSANDRA_HOME}/bin/cassandra"
@@ -68,7 +68,7 @@ def DoStatus():
   nodeID = list(config['nodes'].keys())[0]
   ssh_execute_command(nodeID, f"{NODETOOL} status")
 
-if __name__=="__main__":
+def main_cli():
   argument_parser = argparse.ArgumentParser()
   argument_parser.add_argument('action', choices=['setup', 'configure', 'start', 'stop', 'reset', 'status'])
   argument_parser.add_argument('-v','--verbose', action='store_true', default=False)

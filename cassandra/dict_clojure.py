@@ -1,5 +1,5 @@
-from lib.regex_utils import is_reference
-from lib.env import get_from_env
+from cassandra.regex_utils import is_reference
+from cassandra.env import get_from_env
 
 def closure_for_skel(skel, env):
   if isinstance(skel, list):

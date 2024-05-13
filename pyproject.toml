@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cassandra"
+version = "2024.5.13"
+requires-python = ">= 3.10"
+license-files = { paths = ["LICENSE"] }
+authors = [
+  { name="Refolli Francesco", email="francesco.refolli@gmail.com" }
+]
+maintainers = [
+  { name="Refolli Francesco", email="francesco.refolli@gmail.com" }
+]
+description = "Cassandra CLI Utility for handling cluster of VMs"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "yaml"
+]
+
+[project.urls]
+Repository = "https://github.com/frefolli/cassandra"
+
+[project.scripts]
+cassandra-cli = "cassandra.__main__:main_cli"
+
+[tool.hatch.build]
+include = [
+  "cassandra/*.py"
+]

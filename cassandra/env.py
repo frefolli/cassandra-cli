@@ -1,4 +1,4 @@
-from lib.regex_utils import is_ip_address, is_nodeID, is_domain
+from cassandra.regex_utils import is_ip_address, is_nodeID, is_domain
 
 def build_env_for_node(config: dict, nodeID: str):
   env = {}

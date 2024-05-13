@@ -1,4 +1,4 @@
-from lib.regex_utils import is_ip_address, is_nodeID, is_domain
+from cassandra.regex_utils import is_ip_address, is_nodeID, is_domain
 
 def find_ip_from_domain(config: dict, domain: str) -> str:
   for nodeID in config['nodes']:

@@ -1,0 +1,27 @@
+people: 
+  - name: "Francesco"
+    surname: "Refolli"
+    email: "francesco.refolli@gmail.com"
+    role: "Contributor & Maintainer"
+pkgname: "cassandra"
+pkgver: "master"
+pkgrel: 1
+pkgdesc: "Cassandra CLI Utility for handling cluster of VMs"
+license: 'GPL-3.0-or-later'
+arch:
+  - 'any'
+makedepends:
+  - 'python-build'
+  - 'python-installer'
+  - 'python-wheel'
+  - 'python-hatchling'
+depends:
+  - 'python-yaml'
+url: "https://github.com/frefolli/cassandra-cli"
+archive: "https://github.com/frefolli/cassandra-cli/archive"
+build:
+  - "make BUILD_TYPE=release"
+package:
+  - "make DESTDIR=$pkgdir install"
+options:
+  debug: False
