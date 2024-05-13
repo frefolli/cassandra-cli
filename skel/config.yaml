@@ -1,0 +1,13 @@
+nodes:
+ #- name: node_name
+ #  address: node_address
+ #  datacenter: node_datacenter
+ #  rack: node_rack
+ #  ip: node_ip
+options:
+  name: 'MyNewCluster'
+  num_tokens: 256
+  consistency_level: QUORUM
+  replication_factor: 3
+  seeds:
+   #- seed_node_name
