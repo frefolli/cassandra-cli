@@ -1,6 +1,4 @@
 @all:
-
-build:
 	python -m build --wheel --no-isolation
 
 install:
