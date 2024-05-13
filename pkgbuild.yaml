@@ -17,8 +17,8 @@ makedepends:
   - 'python-hatchling'
 depends:
   - 'python-yaml'
-url: "https://github.com/frefolli/cassandra-cli"
-archive: "https://github.com/frefolli/cassandra-cli/archive"
+url: "https://github.com/frefolli/python-cassandra"
+archive: "https://github.com/frefolli/python-cassandra/archive"
 build:
   - "make BUILD_TYPE=release"
 package:
