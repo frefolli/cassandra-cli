@@ -3,7 +3,7 @@ people:
     surname: "Refolli"
     email: "francesco.refolli@gmail.com"
     role: "Contributor & Maintainer"
-pkgname: "cassandra"
+pkgname: "python-cassandra"
 pkgver: "master"
 pkgrel: 1
 pkgdesc: "Cassandra CLI Utility for handling cluster of VMs"
