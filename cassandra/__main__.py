@@ -24,25 +24,25 @@ def FallbackIfNotThere(local_path, fallback):
     _system_command(f"cp {fallback} {local_path}")
 
 def ConfigYamlPath():
-  local_path = "~/.config/python-cassandra/config.yaml"
+  local_path = os.path.expanduser("~/.config/python-cassandra/config.yaml")
   fallback = "/usr/share/python-cassandra/config.yaml"
   FallbackIfNotThere(local_path, fallback)
   return local_path
 
 def CassandraSetupPath():
-  local_path = "~/.config/python-cassandra/skel/cassandra-setup.sh"
+  local_path = os.path.expanduser("~/.config/python-cassandra/skel/cassandra-setup.sh")
   fallback = "/usr/share/python-cassandra/skel/cassandra-setup.sh"
   FallbackIfNotThere(local_path, fallback)
   return local_path
 
 def CassandraYamlPath():
-  local_path = "~/.config/python-cassandra/skel/cassandra.yaml"
+  local_path = os.path.expanduser("~/.config/python-cassandra/skel/cassandra.yaml")
   fallback = "/usr/share/python-cassandra/skel/cassandra.yaml"
   FallbackIfNotThere(local_path, fallback)
   return local_path
 
 def CassandraRackDcYamlPath():
-  local_path = "~/.config/python-cassandra/skel/cassandra-rackdc.yaml"
+  local_path = os.path.expanduser("~/.config/python-cassandra/skel/cassandra-rackdc.yaml")
   fallback = "/usr/share/python-cassandra/skel/cassandra-rackdc.yaml"
   FallbackIfNotThere(local_path, fallback)
   return local_path
