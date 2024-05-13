@@ -1,0 +1,13 @@
+cluster_name: $(options.name)
+num_tokens: $(options.num_tokens)
+seed_provider:
+  - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+    parameters:
+      - seeds: $(options.seeds)
+listen_address: $(node.ip)
+rpc_address: $(node.ip)
+endpoint_snitch: GossipingPropertyFileSnitch
+commitlog_sync: periodic
+commitlog_sync_period: 10000ms
+partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+allocate_tokens_for_local_replication_factor: $(options.replication_factor)

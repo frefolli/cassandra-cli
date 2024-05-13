@@ -1,0 +1,2 @@
+dc: $(node.datacenter)
+rack: $(node.rack)
