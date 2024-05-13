@@ -47,6 +47,12 @@ def CassandraRackDcYamlPath():
   FallbackIfNotThere(local_path, fallback)
   return local_path
 
+def CheckConfigFiles():
+  ConfigYamlPath()
+  CassandraSetupPath()
+  CassandraYamlPath()
+  CassandraRackDcYamlPath()
+
 def DoSetup():
   config = preprocess_config(read_yaml_file("config.yaml"))
   skel_cassandra_setup = read_bash_file("skel/cassandra-setup.sh")
@@ -106,6 +112,7 @@ def main_cli():
   if cli_config.verbose:
     logging.getLogger().setLevel(logging.DEBUG)
 
+  CheckConfigFiles()
   match cli_config.action:
     case 'setup':
       DoSetup()
