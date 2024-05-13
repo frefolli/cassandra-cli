@@ -12,11 +12,40 @@ from cassandra.config import preprocess_config
 from cassandra.env import build_env_for_node
 from cassandra.dict_clojure import closure_for_skel
 from cassandra.jinja_clojure import closure_for_jinja
-from cassandra.ssh import ssh_execute_command, ssh_send_file
+from cassandra.ssh import ssh_execute_command, ssh_send_file, _system_command
 
 CASSANDRA_HOME="/home/cassandra24/apache-cassandra-5.0-beta1"
 CASSANDRA=f"{CASSANDRA_HOME}/bin/cassandra"
 NODETOOL=f"{CASSANDRA_HOME}/bin/nodetool"
+
+def FallbackIfNotThere(local_path, fallback):
+  if not os.path.exists(local_path):
+    _system_command(f"mkdir -p {os.path.dirname(local_path)}")
+    _system_command(f"cp {fallback} {local_path}")
+
+def ConfigYamlPath():
+  local_path = "~/.config/python-cassandra/config.yaml"
+  fallback = "/usr/share/python-cassandra/config.yaml"
+  FallbackIfNotThere(local_path, fallback)
+  return local_path
+
+def CassandraSetupPath():
+  local_path = "~/.config/python-cassandra/skel/cassandra-setup.sh"
+  fallback = "/usr/share/python-cassandra/skel/cassandra-setup.sh"
+  FallbackIfNotThere(local_path, fallback)
+  return local_path
+
+def CassandraYamlPath():
+  local_path = "~/.config/python-cassandra/skel/cassandra.yaml"
+  fallback = "/usr/share/python-cassandra/skel/cassandra.yaml"
+  FallbackIfNotThere(local_path, fallback)
+  return local_path
+
+def CassandraRackDcYamlPath():
+  local_path = "~/.config/python-cassandra/skel/cassandra-rackdc.yaml"
+  fallback = "/usr/share/python-cassandra/skel/cassandra-rackdc.yaml"
+  FallbackIfNotThere(local_path, fallback)
+  return local_path
 
 def DoSetup():
   config = preprocess_config(read_yaml_file("config.yaml"))
@@ -33,9 +62,9 @@ def DoSetup():
       ssh_execute_command(nodeID, "bash cassandra-setup.sh")
 
 def DoConfigure():
-  config = preprocess_config(read_yaml_file("config.yaml"))
-  skel_cassandra_yaml = read_yaml_file("skel/cassandra.yaml")
-  skel_cassandra_rackdc_yaml = read_yaml_file("skel/cassandra-rackdc.yaml")
+  config = preprocess_config(read_yaml_file(ConfigYamlPath()))
+  skel_cassandra_yaml = read_yaml_file(CassandraYamlPath())
+  skel_cassandra_rackdc_yaml = read_yaml_file(CassandraRackDcYamlPath())
   with tempfile.TemporaryDirectory() as tmpdir:
     for nodeID in config['nodes']:
       env = build_env_for_node(config, nodeID)
@@ -49,22 +78,22 @@ def DoConfigure():
       ssh_send_file(nodeID, cassandra_rackdc_yaml_path, f"{CASSANDRA_HOME}/conf")
 
 def DoStart():
-  config = preprocess_config(read_yaml_file("config.yaml"))
+  config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
     ssh_execute_command(nodeID, f"\"nohup {CASSANDRA} &\"")
 
 def DoStop():
-  config = preprocess_config(read_yaml_file("config.yaml"))
+  config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
     ssh_execute_command(nodeID, f"{NODETOOL} stopdaemon")
 
 def DoReset():
-  config = preprocess_config(read_yaml_file("config.yaml"))
+  config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
     ssh_execute_command(nodeID, f"rm -rf {CASSANDRA_HOME}/data/*")
 
 def DoStatus():
-  config = preprocess_config(read_yaml_file("config.yaml"))
+  config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   nodeID = list(config['nodes'].keys())[0]
   ssh_execute_command(nodeID, f"{NODETOOL} status")
 
@@ -90,3 +119,6 @@ def main_cli():
       DoReset()
     case 'status':
       DoStatus()
+
+if __name__ == "__main__":
+  main_cli()

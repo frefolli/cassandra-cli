@@ -3,3 +3,5 @@
 
 install:
 	python -m installer --destdir="${DESTDIR}" dist/*.whl
+	mkdir -p ${DESTDIR}/usr/share/python-cassandra
+	cp -r skel ${DESTDIR}/usr/share/python-cassandra
