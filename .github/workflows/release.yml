@@ -2,37 +2,28 @@ name: CD/CI
 run-name: Build Job ${{ github.event.head_commit.message }} by @${{ github.actor }}
 env:
  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+ VERSION: "v${{ github.head_ref || github.ref_name }}"
 on:
   push:
     branches:
-      - master
+      - '[0-9]+.[0-9]+.[0-9]+'
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
   deploy:
-    name: Deploy PKGBUILD
+    name: Assemble PKGBUILD and releases it
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Set up JDK 17
-        uses: actions/setup-java@v1
-        with:
-          java-version: 17
-      - name: Cache Maven packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
       - name: Generate PKGBUILD
         run: python -m pkgbuilder > PKGBUILD
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest-${{ env.BRANCH_NAME }}"
+          automatic_release_tag: "${{ env.VERSION }}"
           prerelease: true
-          title: "Latest ${{ env.BRANCH_NAME }} Build"
+          title: "Latest ${{ env.VERSION }} Build"
           files: |
             PKGBUILD

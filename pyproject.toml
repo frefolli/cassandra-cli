@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cassandra"
-version = "2024.5.13"
+version = "1.0.0-beta"
 requires-python = ">= 3.10"
 license-files = { paths = ["LICENSE"] }
 authors = [

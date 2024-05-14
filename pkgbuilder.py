@@ -2,6 +2,9 @@
 import urllib.request
 import hashlib
 import yaml
+import argparse
+import sys
+import logging
 
 def read_yaml_file(yaml_file_path: str) -> dict:
   with open(yaml_file_path, mode="r", encoding="utf-8") as file:
@@ -56,6 +59,7 @@ class Pkgbuilder:
     def compute_hash(self):
         link = "%s/%s.tar.gz" % (self.config["archive"], self.config["pkgver"])
         file = "%s.tar.gz" % self.config["pkgver"]
+        logging.debug("Downloading '%s' as '%s'" % (link, file))
         urllib.request.urlretrieve(link, file)
         hash = b""
         with open(file, mode="rb") as _in:
@@ -76,6 +80,17 @@ class Pkgbuilder:
             print("  " + line)
         print("}")
 
-if __name__ == "__main__":
+def main_cli():
+    cli = argparse.ArgumentParser(description="Declarative PKGBUILD automatic generation")
+    cli.add_argument("-V", "--version", type=str, default=None, help="override Version field from CLI")
+    cli.add_argument("-v", "--verbose", action='store_true', default=False, help="Enables verbose log")
+    will = cli.parse_args(sys.argv[1:])
+    if will.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
     config = read_yaml_file('pkgbuild.yaml')
+    if will.version is not None:
+        config['pkgver'] = will.version
     Pkgbuilder(config).print()
+
+if __name__ == "__main__":
+    main_cli()
