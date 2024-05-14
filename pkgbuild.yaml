@@ -4,7 +4,7 @@ people:
     email: "francesco.refolli@gmail.com"
     role: "Contributor & Maintainer"
 pkgname: "python-cassandra"
-pkgver: "master"
+pkgver: "1.0.0"
 pkgrel: 1
 pkgdesc: "Cassandra CLI Utility for handling cluster of VMs"
 license: 'GPL-3.0-or-later'
