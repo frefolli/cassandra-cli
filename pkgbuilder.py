@@ -48,6 +48,7 @@ class Pkgbuilder:
         print("pkgdesc=\'%s\'" % self.config["pkgdesc"])
         print("license=('%s')" % self.config["license"])
         print("arch=(%s)" % " ".join(["'%s'" % arch for arch in self.config["arch"]]))
+        print("depends=(%s)" % " ".join(["'%s'" % depends for depends in self.config["depends"]]))
         print("makedepends=(%s)" % " ".join(["'%s'" % makedepends for makedepends in self.config["makedepends"]]))
         print("url='%s'" % self.config["url"])
 
