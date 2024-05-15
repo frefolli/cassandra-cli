@@ -10,28 +10,5 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  deploy:
-    name: Assemble PKGBUILD and releases it
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Cache Pkgbuilder
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache
-          key: ${{ runner.os }}-cache
-          restore-keys: ${{ runner.os }}-m2
-      - uses: frefolli/action-pkgbuilder@master
-        with:
-          cache-path: ~/.cache
-          output-path: PKGBUILD
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.VERSION }}"
-          prerelease: true
-          title: "Latest ${{ env.VERSION }} Build"
-          files: |
-            PKGBUILD
+  workflow-pkgbuilder:
+    uses: frefolli/action-pkgbuilder/workflow.yml@master
