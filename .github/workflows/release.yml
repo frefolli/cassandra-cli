@@ -12,3 +12,7 @@ on:
 jobs:
   workflow-pkgbuilder:
     uses: frefolli/workflow-pkgbuilder/.github/workflows/release.yml@master
+    with:
+      VERSION: "${{ env.VERSION }}"
+    secrets:
+      GITHUB_TOKEN: "${{ GITHUB_TOKEN }}"
