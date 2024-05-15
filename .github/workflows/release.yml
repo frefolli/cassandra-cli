@@ -11,4 +11,4 @@ on:
     types: [opened, synchronize, reopened]
 jobs:
   workflow-pkgbuilder:
-    uses: frefolli/action-pkgbuilder/workflow.yml@master
+    uses: frefolli/workflow-pkgbuilder/.github/workflows/release.yml@master
