@@ -17,8 +17,16 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Generate PKGBUILD
-        run: python -m pkgbuilder > PKGBUILD
+      - name: Cache Pkgbuilder
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache
+          key: ${{ runner.os }}-cache
+          restore-keys: ${{ runner.os }}-m2
+      - uses: frefolli/action-pkgbuilder@master
+        with:
+          cache-path: ~/.cache
+          output-path: PKGBUILD
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
