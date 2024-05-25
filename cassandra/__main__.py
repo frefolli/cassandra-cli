@@ -14,7 +14,8 @@ from cassandra.dict_clojure import closure_for_skel
 from cassandra.jinja_clojure import closure_for_jinja
 from cassandra.ssh import ssh_execute_command, ssh_send_file, _system_command
 
-CASSANDRA_HOME="/home/cassandra24/apache-cassandra-5.0-beta1"
+NODE_HOME = "/home/cassandra24"
+CASSANDRA_HOME=f"{NODE_HOME}/apache-cassandra-5.0-beta1"
 CASSANDRA=f"{CASSANDRA_HOME}/bin/cassandra"
 NODETOOL=f"{CASSANDRA_HOME}/bin/nodetool"
 
@@ -47,11 +48,32 @@ def CassandraRackDcYamlPath():
   FallbackIfNotThere(local_path, fallback)
   return local_path
 
+def CassandraStartPath():
+  local_path = os.path.expanduser("~/.config/python-cassandra/start.sh")
+  fallback = "/usr/share/python-cassandra/start.sh"
+  FallbackIfNotThere(local_path, fallback)
+  return local_path
+
+def CassandraStopPath():
+  local_path = os.path.expanduser("~/.config/python-cassandra/stop.sh")
+  fallback = "/usr/share/python-cassandra/stop.sh"
+  FallbackIfNotThere(local_path, fallback)
+  return local_path
+
+def CassandraResetPath():
+  local_path = os.path.expanduser("~/.config/python-cassandra/reset.sh")
+  fallback = "/usr/share/python-cassandra/reset.sh"
+  FallbackIfNotThere(local_path, fallback)
+  return local_path
+
 def CheckConfigFiles():
   ConfigYamlPath()
   CassandraSetupPath()
   CassandraYamlPath()
   CassandraRackDcYamlPath()
+  CassandraStartPath()
+  CassandraStopPath()
+  CassandraResetPath()
 
 def DoSetup():
   config = preprocess_config(read_yaml_file("config.yaml"))
@@ -82,21 +104,29 @@ def DoConfigure():
       write_properties_file(cassandra_rackdc_yaml_path, cassandra_rackdc_yaml)
       ssh_send_file(nodeID, cassandra_yaml_path, f"{CASSANDRA_HOME}/conf")
       ssh_send_file(nodeID, cassandra_rackdc_yaml_path, f"{CASSANDRA_HOME}/conf")
+      ssh_send_file(nodeID, CassandraStartPath(), f"{NODE_HOME}/start.sh")
+      ssh_send_file(nodeID, CassandraStopPath(), f"{NODE_HOME}/stop.sh")
+      ssh_send_file(nodeID, CassandraResetPath(), f"{NODE_HOME}/reset.sh")
 
 def DoStart():
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
-    ssh_execute_command(nodeID, f"\"nohup {CASSANDRA} &\"")
+    ssh_execute_command(nodeID, f"./start.sh")
 
 def DoStop():
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
     ssh_execute_command(nodeID, f"{NODETOOL} stopdaemon")
 
+def DoKill():
+  config = preprocess_config(read_yaml_file(ConfigYamlPath()))
+  for nodeID in config['nodes']:
+    ssh_execute_command(nodeID, f"./stop.sh")
+
 def DoReset():
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
-    ssh_execute_command(nodeID, f"rm -rf {CASSANDRA_HOME}/data/*")
+    ssh_execute_command(nodeID, f"./reset.sh")
 
 def DoStatus():
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
@@ -122,6 +152,8 @@ def main_cli():
       DoStart()
     case 'stop':
       DoStop()
+    case 'kill':
+      DoKill()
     case 'reset':
       DoReset()
     case 'status':
