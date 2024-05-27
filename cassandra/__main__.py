@@ -75,7 +75,7 @@ def CheckConfigFiles():
   CassandraStopPath()
   CassandraResetPath()
 
-def DoSetup():
+def DoSetup(cli_config):
   config = preprocess_config(read_yaml_file("config.yaml"))
   skel_cassandra_setup = read_bash_file("skel/cassandra-setup.sh")
   with tempfile.TemporaryDirectory() as tmpdir:
@@ -89,7 +89,7 @@ def DoSetup():
       ssh_send_file(nodeID, cassandra_setup_path, "/home/cassandra24")
       ssh_execute_command(nodeID, "bash cassandra-setup.sh")
 
-def DoConfigure():
+def DoConfigure(cli_config):
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   skel_cassandra_yaml = read_yaml_file(CassandraYamlPath())
   skel_cassandra_rackdc_yaml = read_yaml_file(CassandraRackDcYamlPath())
@@ -102,41 +102,44 @@ def DoConfigure():
       cassandra_rackdc_yaml = closure_for_skel(skel_cassandra_rackdc_yaml.copy(), env)
       cassandra_rackdc_yaml_path = os.path.join(tmpdir, "cassandra-rackdc.properties")
       write_properties_file(cassandra_rackdc_yaml_path, cassandra_rackdc_yaml)
-      ssh_send_file(nodeID, cassandra_yaml_path, f"{CASSANDRA_HOME}/conf")
-      ssh_send_file(nodeID, cassandra_rackdc_yaml_path, f"{CASSANDRA_HOME}/conf")
+      #ssh_send_file(nodeID, cassandra_yaml_path, f"{CASSANDRA_HOME}/conf")
+      #ssh_send_file(nodeID, cassandra_rackdc_yaml_path, f"{CASSANDRA_HOME}/conf")
       ssh_send_file(nodeID, CassandraStartPath(), f"{NODE_HOME}/start.sh")
       ssh_send_file(nodeID, CassandraStopPath(), f"{NODE_HOME}/stop.sh")
       ssh_send_file(nodeID, CassandraResetPath(), f"{NODE_HOME}/reset.sh")
 
-def DoStart():
+def DoStart(cli_config):
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
     ssh_execute_command(nodeID, f"./start.sh")
 
-def DoStop():
+def DoStop(cli_config):
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
     ssh_execute_command(nodeID, f"{NODETOOL} stopdaemon")
 
-def DoKill():
+def DoKill(cli_config):
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
     ssh_execute_command(nodeID, f"./stop.sh")
 
-def DoReset():
+def DoReset(cli_config):
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
   for nodeID in config['nodes']:
     ssh_execute_command(nodeID, f"./reset.sh")
 
-def DoStatus():
+def DoStatus(cli_config):
   config = preprocess_config(read_yaml_file(ConfigYamlPath()))
-  nodeID = list(config['nodes'].keys())[0]
+  nodeID = cli_config.target
+  if nodeID is None:
+    nodeID = list(config['nodes'].keys())[0]
   ssh_execute_command(nodeID, f"{NODETOOL} status")
 
 def main_cli():
   argument_parser = argparse.ArgumentParser()
   argument_parser.add_argument('action', choices=['setup', 'configure', 'start', 'stop', 'reset', 'status'])
   argument_parser.add_argument('-v','--verbose', action='store_true', default=False)
+  argument_parser.add_argument('-t','--target', type=str, default=None, help='specify a target node')
   cli_config = argument_parser.parse_args(sys.argv[1:])
 
   if cli_config.verbose:
@@ -145,19 +148,19 @@ def main_cli():
   CheckConfigFiles()
   match cli_config.action:
     case 'setup':
-      DoSetup()
+      DoSetup(cli_config)
     case 'configure':
-      DoConfigure()
+      DoConfigure(cli_config)
     case 'start':
-      DoStart()
+      DoStart(cli_config)
     case 'stop':
-      DoStop()
+      DoStop(cli_config)
     case 'kill':
-      DoKill()
+      DoKill(cli_config)
     case 'reset':
-      DoReset()
+      DoReset(cli_config)
     case 'status':
-      DoStatus()
+      DoStatus(cli_config)
 
 if __name__ == "__main__":
   main_cli()
